@@ -1,6 +1,3 @@
-
-
-
 class EvaluationMetrics:
     def __init__(self):
         self.games_played = 0

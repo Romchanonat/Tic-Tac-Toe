@@ -15,9 +15,6 @@ class Evaluator:
             -1: agent_b,
         }
 
-        for agent in agents.values():
-            agent.reset()
-
         current_player = 1
 
         while True:
