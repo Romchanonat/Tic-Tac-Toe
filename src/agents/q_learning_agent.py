@@ -11,72 +11,56 @@ TABLE_PATH = "models/q_learning_tictactoe.json"
 class QLearningAgent(BaseAgent):
 
     def __init__(
-            self, 
+            self,
             player: int,
             alpha: float = 0.1,
             gamma: float = 0.9,
             epsilon: float = 0.1,
             ):
-        
+
         super().__init__(player)
-        
+
         self.gamma = gamma
         self.alpha = alpha
         self.epsilon = epsilon
 
         self.q_table = defaultdict(float)
 
+    def _normalize_state(self, state):
+        return tuple(cell * self.player for cell in state)
 
     def _get_Q_value(self, state, action):
-        state_key = tuple(state)
+        state_key = self._normalize_state(state)
         return self.q_table[(state_key, action)]
-
 
     def select_action(self, state, valid_moves):
         if not valid_moves:
             raise ValueError(f"no valid move with state: {state}")
 
-        # choose wether we want to explore or maximise the reward with our current knowledge
-        
-        #Exploration
         if random.random() < self.epsilon:
             return random.choice(valid_moves)
 
-        #Exploitation
-        self.q_values = [
+        q_values = [
             self._get_Q_value(state, action)
             for action in valid_moves
         ]
 
-        max_q = max(self.q_values)
-
+        max_q = max(q_values)
 
         best_moves = [
             action
-            for action, q_value in zip(valid_moves, self.q_values)
+            for action, q_value in zip(valid_moves, q_values)
             if q_value == max_q
         ]
 
         return random.choice(best_moves)
 
-
     def update(self, state, action, reward, next_state, next_valid_moves, done):
-
-        current_q = self._get_Q_value(state, action)
+        normalized_state = self._normalize_state(state)
+        current_q = self.q_table[(normalized_state, action)]
 
         if done or not next_valid_moves:
             target = reward
-        else:
-            max_next_q = max(
-                self._get_Q_value(next_state, next_action)
-                for next_action in next_valid_moves
-            )
-
-            target = reward + self.gamma * max_next_q
-
-        self.q_table[(tuple(state), action)] = (
-            current_q + self.alpha * (target - current_q)
-        )
 
 
     def decay_epsilon(self, decay=0.995, min_espilon=0.01):
