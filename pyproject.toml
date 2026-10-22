@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tictactoe-rl"
+version = "1.0.0"
+description = "Tic-tac-toe agents trained with reinforcement learning (Q-learning and DQN)"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+plots = ["matplotlib>=3.7"]
+dev = ["pytest>=7"]
+
+[project.scripts]
+tictactoe-rl = "tictactoe_rl.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["tictactoe_rl*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
