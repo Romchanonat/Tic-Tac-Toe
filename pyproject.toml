@@ -8,17 +8,17 @@ version = "1.0.0"
 description = "Tic-tac-toe agents trained with reinforcement learning (Q-learning and DQN)"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = ["numpy>=1.24", "torch>=2.0"]
 
 [project.optional-dependencies]
 plots = ["matplotlib>=3.7"]
-dev = ["pytest>=7"]
+dev = ["pytest>=7", "matplotlib>=3.7"]
 
 [project.scripts]
-tictactoe-rl = "tictactoe_rl.cli:main"
+src = "src.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["tictactoe_rl*"]
+include = ["src*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
