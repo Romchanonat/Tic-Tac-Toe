@@ -40,3 +40,5 @@ def test_pipeline_runs_with_random_agents():
     assert stats["wins"] + stats["draws"] + stats["losses"] == 50
     result = Evaluator().evaluate(RandomAgent(), RandomAgent(), games=100)
     assert result["games"] == 100
+
+
