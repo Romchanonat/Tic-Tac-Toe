@@ -7,6 +7,7 @@ from typing import Callable, Optional
 from src.agents.base_agent import BaseAgent
 from src.agents.minimax_agent import MinimaxAgent
 from src.agents.random_agent import RandomAgent
+from src.agents.QLearning_agent import QLearningAgent
 from src.config import MODELS_DIR
 
 
@@ -24,7 +25,13 @@ class AgentSpec:
 
 AGENTS: dict[str, AgentSpec] = {
     "random": AgentSpec("Random", lambda: RandomAgent),
-    "minimax": AgentSpec("Minimax", lambda: MinimaxAgent)
+    "minimax": AgentSpec("Minimax", lambda: MinimaxAgent),
+    "q_learning": AgentSpec(
+        "Q-learning",
+        lambda: QLearningAgent,
+        model_file="q_learning.json",
+        params={"alpha": 0.1, "gamma": 0.9, "epsilon": 1.0}
+    )
 }
 
 
