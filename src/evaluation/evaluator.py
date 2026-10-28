@@ -1,76 +1,56 @@
 
-from environment.board import Board
-from evaluation.metrics import EvaluationMetrics
+from src.agents.base_agent import BaseAgent
+from src.environment.board import Board
+from src.evaluation.metrics import EvaluationMetrics
 
 
 class Evaluator:
-    def __init__(self, board_factory=Board):
-        self.board_factory = board_factory
+    """Plays matches between two agents (no learning, no exploration)."""
 
-    def play_game(self, agent_a, agent_b):
+    @staticmethod
+    def play_game(first: BaseAgent, second: BaseAgent) -> int:
+        """Play one game; ``first`` plays X. Return 1 (X wins), -1 (O wins) or 0 (draw)."""
+        first.player, second.player = 1, -1
+        first.reset()
+        second.reset()
 
-        board = self.board_factory()
-        agents = {
-            1: agent_a,
-            -1: agent_b,
-        }
-
-        current_player = 1
+        board = Board()
+        current = first
 
         while True:
-            agent = agents[current_player]
-
             state = board.get_state()
             valid_moves = board.get_valid_moves()
-
-            if not valid_moves:
-                return "draw"
-
-            action = agent.select_action(state, valid_moves)
+            action = current.select_action(state, valid_moves)
 
             if action not in valid_moves:
                 raise ValueError(
-                    f"{agent.__class__.__name__} a choisi "
-                    f"un coup invalide : {action}"
+                    f"{type(current).__name__} chose an illegal move: {action}"
                 )
-
-            board.make_move(action, current_player)
+            board.make_move(action, current.player)
 
             winner = board.check_winner()
+            if winner != 0:
+                return winner
+            if board.is_full():
+                return 0
 
-            if winner == current_player:
-                return "A" if current_player == 1 else "B"
+            current = second if current is first else first
 
-            if not board.get_valid_moves():
-                return "draw"
-
-            current_player = -current_player
-
-    def evaluate(self, agent_a_factory, agent_b_factory, games=100):
-
+    def evaluate(self, agent_a: BaseAgent, agent_b: BaseAgent, games: int = 100) -> dict:
+        """Play ``games`` games, alternating which agent starts."""
         if games <= 0:
-            raise ValueError("games doit être strictement positif")
+            raise ValueError("games must be positive")
 
         metrics = EvaluationMetrics()
 
         for game_index in range(games):
             if game_index % 2 == 0:
-                agent_a = agent_a_factory(1)
-                agent_b = agent_b_factory(-1)
-
-                result = self.play_game(agent_a, agent_b)
-
+                outcome = self.play_game(agent_a, agent_b)
+                a_won, b_won = outcome == 1, outcome == -1
             else:
-                agent_b = agent_b_factory(1)
-                agent_a = agent_a_factory(-1)
+                outcome = self.play_game(agent_b, agent_a)
+                a_won, b_won = outcome == -1, outcome == 1
 
-                result = self.play_game(agent_b, agent_a)
-
-                if result == "A":
-                    result = "B"
-                elif result == "B":
-                    result = "A"
-
-            metrics.record_result(result)
+            metrics.record_result("A" if a_won else "B" if b_won else "draw")
 
         return metrics.summary()
