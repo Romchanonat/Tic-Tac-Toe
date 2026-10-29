@@ -22,6 +22,12 @@ class AgentSpec:
     def trainable(self) -> bool:
         return self.model_file is not None
 
+def _dqn_class():
+    from src.agents.dqn_agent import DQNAgent
+    return DQNAgent
+
+
+
 
 AGENTS: dict[str, AgentSpec] = {
     "random": AgentSpec("Random", lambda: RandomAgent),
@@ -31,6 +37,10 @@ AGENTS: dict[str, AgentSpec] = {
         lambda: QLearningAgent,
         model_file="q_learning.json",
         params={"alpha": 0.1, "gamma": 0.9, "epsilon": 1.0}
+    ),
+    "dqn": AgentSpec(
+        "DQN", _dqn_class, model_file="dqn.pth",
+        params={"learning_rate": 1e-3, "gamma": 0.99, "epsilon": 1.0},
     )
 }
 

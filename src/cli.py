@@ -83,7 +83,7 @@ def build_parser() -> argparse.ArgumentParser:
     evaluate = subparsers.add_parser("evaluate", help="round-robin between saved agents")
     add_common(evaluate)
     evaluate.add_argument("--agents", nargs="+", choices=sorted(AGENTS),
-                          default=["random", "minimax", "q_learning", ]) #,  "dqn"
+                          default=["random", "minimax", "q_learning", "dqn"])
     evaluate.add_argument("--games", type=int, default=1000, help="games per matchup")
     evaluate.add_argument("--seed", type=int, default=42)
     evaluate.set_defaults(func=cmd_evaluate)
